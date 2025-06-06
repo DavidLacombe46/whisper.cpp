@@ -70,17 +70,6 @@ end
 
 Some models are prepared up-front:
 
-```ruby
-base_en = Whisper::Model.pre_converted_models["base.en"]
-whisper = Whisper::Context.new(base_en)
-```
-
-At first time you use a model, it is downloaded automatically. After that, downloaded cached file is used. To clear cache, call `#clear_cache`:
-
-```ruby
-Whisper::Model.pre_converted_models["base"].clear_cache
-```
-
 You also can use shorthand for pre-converted models:
 
 ```ruby
@@ -103,6 +92,19 @@ puts Whisper::Model.pre_converted_models.keys
 # base-q8_0
 #   :
 #   :
+```
+
+You can also retrieve each model:
+
+```ruby
+base_en = Whisper::Model.pre_converted_models["base.en"]
+whisper = Whisper::Context.new(base_en)
+```
+
+At first time you use a model, it is downloaded automatically. After that, downloaded cached file is used. To clear cache, call `#clear_cache`:
+
+```ruby
+Whisper::Model.pre_converted_models["base"].clear_cache
 ```
 
 You can also use local model files you prepared:
@@ -162,6 +164,16 @@ For details on VAD, see [whisper.cpp's README](https://github.com/ggml-org/whisp
 
 API
 ---
+
+### Transcription ###
+
+By default, `Whisper::Context#transcribe` works in a single thread. You can make it work in parallel by passing `n_processors` option:
+
+```ruby
+whisper.transcribe("path/to/audio.wav", params, n_processors: Etc.nprocessors)
+```
+
+Note that transcription occasionally might be low accuracy when it works in parallel.
 
 ### Segments ###
 
@@ -296,6 +308,11 @@ Development
 First call of `rake test` builds an extension and downloads a model for testing. After that, you add tests in `tests` directory and modify `ext/ruby_whisper.cpp`.
 
 If something seems wrong on build, running `rake clean` solves some cases.
+
+### Need help ###
+
+* Windows support
+* Refinement of C/C++ code, especially memory management
 
 License
 -------
